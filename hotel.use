@@ -1,0 +1,174 @@
+
+-- -------------------------------- Model Declaration  ------------------------------
+
+model Hotel
+
+-- -------------------------------- Class Definitions  ------------------------------
+
+class Hotel
+attributes
+    id: Integer
+    name: String
+    address: String
+    rating: Real
+
+operations
+    updateRating(newRating: Integer)
+end
+
+class Guest
+attributes
+    id: Integer
+    fullName: String
+    age: Integer
+    email: String
+    phoneNumber: Integer
+
+operations
+    updatePhoneNumber(newPhoneNumber: Integer)
+end
+
+class Room 
+attributes
+    id: Integer
+    roomType: String
+    isAvailable: Boolean
+end
+
+class Booking
+attributes
+    id: Integer
+    guest: Guest
+    room: Room
+    totalNights: Integer
+    status: String
+
+operations
+    makeBooking(guest: Guest, room: Room, Nights: Integer, price: Payment)
+    updateStatus(newStatus: String)
+
+end
+
+class Payment
+attributes
+    id: Integer
+    paymentAmount: Real
+    paymentMethod: String
+    paymentStatus: String
+
+operations
+    makePayment(cash:Real, paymentAmount: Real)
+end
+
+-- -------------------------------- Associations  ------------------------------
+
+association BookAt between
+    Hotel[1..*] role hotels
+    Booking[0..*] role bookings
+end
+
+association BookFor between
+    Booking[0..*] role bookings
+    Guest[1..*] role guests
+end
+
+composition WhichRoom between
+    Booking[1] role booking
+    Room[0..1] role room
+end
+
+composition HotelRoom between
+    Room[0..*] role room
+    Hotel[1..*] role hotel
+end
+
+association PayBooking between
+    Booking[1] role booking
+    Payment[0..1] role payment
+end
+
+
+-- -------------------------------- Constraints  ------------------------------
+constraints
+
+-- Hotel Constrains ----------
+context Hotel
+inv UniqueID:
+    -- Hotel IDs must be unique
+    Hotel.allInstances()->forAll(h1, h2 | h1 <> h2 implies h1.id <> h2.id)
+
+inv hotelRatingRange:
+    -- Hotel rate must be between 1 and 5
+    self.rating >= 1 and self.rating <= 5
+
+
+-- Booking Constrains ----------
+context Booking
+inv UniqueID:
+    -- Booking IDs must be unique
+    Booking.allInstances()->forAll(b1, b2 | b1 <> b2 implies b1.id <> b2.id)
+
+    inv nightsLimit:
+    -- Guest can NOT book the room for more than 7 nights
+    self.totalNights <= 7 or self.totalNights > 0
+
+
+-- Guest Constrains ----------
+context Guest
+inv UniqueID:
+    -- Guest IDs must be unique
+    Guest.allInstances()->forAll(g1, g2 | g1 <> g2 implies g1.id <> g2.id)
+
+
+inv AgeGreaterThan21:
+    -- Guest age must be greater than 18
+    self.age > 18
+
+
+-- Room Constrains ----------
+context Room
+inv UniqueID:
+    -- Room IDs must be unique
+    Room.allInstances()->forAll(r1, r2 | r1 <> r2 implies r1.id <> r2.id)
+
+inv ValidRoomType:
+    -- Account type must be either 'single' or 'double' or 'triple'
+    self.roomType = 'single' or self.roomType = 'double' or self.roomType = 'triple'
+
+
+-- Payment Constrains ----------
+context Payment
+inv UniqueID:
+    -- Payment IDs must be unique
+    Payment.allInstances()->forAll(p1, p2 | p1 <> p2 implies p1.id <> p2.id)
+
+inv PriceNotNegative:
+    -- Price Amount can NOT be a negative number
+    self.paymentAmount >= 0
+
+inv ValidPaymentType:
+    -- Account type must be either 'cash' or 'credit'
+    self.paymentMethod = 'cash' or self.paymentMethod = 'credit'
+
+
+-- -------------------------------- Pre/Post conditions for Operations ------------------------------
+
+context Hotel::updateRating(newRating: Integer)
+pre: newRating >= 0 and newRating <= 5
+post: self.rating = newRating
+
+context Guest::updatePhoneNumber(newPhoneNumber: Integer)
+pre: newPhoneNumber <> null
+post: self.phoneNumber = newPhoneNumber
+
+context Booking::makeBooking(guest: Guest, room: Room, Nights: Integer, price: Payment)
+pre: Nights >= 0 and Nights <= 7 and room.isAvailable = true
+post: self.totalNights = Nights and payment.paymentAmount = (Nights*100) and room.isAvailable = false
+
+context Booking::updateStatus(newStatus: String)
+pre: self.status = null
+post: self.status = newStatus
+
+context Payment::makePayment(cash:Real, paymentAmount: Real)
+pre: cash >= paymentAmount
+post: self.paymentStatus = 'Paid Successfully'

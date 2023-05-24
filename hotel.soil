@@ -1,0 +1,79 @@
+-- -------------------------------- instance 1 ------------------------------
+
+!create h1: Hotel
+!set h1.id := 01 
+!set h1.name := 'Ritz Carlton'
+!set h1.address := '1113 Nile Corniche, Ismailia, El Nil, Cairo'
+!set h1.rating := 4.5
+
+!create g1: Guest
+!set g1.id := 101
+!set g1.fullName := 'Mohamed Matar'
+!set g1.age := 22
+!set g1.email := 'matar@gmail.com'
+!set g1.phoneNumber := 01132023999
+
+!create r1: Room
+!set r1.id:= 201
+!set r1.roomType:= 'double'
+!set r1.isAvailable:= true
+
+!create b1: Booking
+!set b1.id := 301
+!set b1.guest := g1
+!set b1.room := r1
+!set b1.totalNights := 5
+!set b1.status := 'Pending'
+
+!create p1: Payment
+!set p1.id := 401
+!set p1.paymentAmount := 0
+!set p1.paymentMethod := 'cash'
+!set p1.paymentStatus := 'Pending'
+
+-- insert into associations 
+!insert (h1,b1) into BookAt
+!insert (b1,g1) into BookFor
+!insert (b1,r1) into WhichRoom
+!insert (r1,h1) into HotelRoom
+!insert (b1,p1) into PayBooking
+
+-- -------------------------------- instance 2 ------------------------------
+
+!create h2: Hotel
+!set h2.id := 02 
+!set h2.name := 'Burj Al Arab'
+!set h2.address := 'Dubai'
+!set h2.rating := 4.9
+
+!create g2: Guest
+!set g2.id := 102
+!set g2.fullName := 'Adham Ahmed'
+!set g2.age := 22
+!set g2.email := 'Adhooom@gmail.com'
+!set g2.phoneNumber := 01162024888
+
+!create r2: Room
+!set r2.id:= 202
+!set r2.roomType:= 'single'
+!set r2.isAvailable:= true
+
+!create b2: Booking
+!set b2.id := 302
+!set b2.guest := g2
+!set b2.room := r2
+!set b2.totalNights := 4
+!set b2.status := 'Pending'
+
+!create p2: Payment
+!set p2.id := 402
+!set p2.paymentAmount := 0
+!set p2.paymentMethod := 'cash'
+!set p2.paymentStatus := 'Pending'
+
+-- insert into associations 
+!insert (h2,b2) into BookAt
+!insert (b2,g2) into BookFor
+!insert (b2,r2) into WhichRoom
+!insert (r2,h2) into HotelRoom
+!insert (b2,p2) into PayBooking
